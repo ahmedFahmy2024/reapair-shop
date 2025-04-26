@@ -2,6 +2,7 @@ import { BackButton } from "@/components/BackButton";
 import { getCustomer } from "@/lib/queries/getCustomer";
 import { getTicket } from "@/lib/queries/getTicket";
 import * as Sentry from "@sentry/nextjs";
+import TicketForm from "./_components/TicketForm";
 
 type props = {
   searchParams: Promise<{ [key: string]: string | undefined }>;
@@ -49,7 +50,7 @@ export default async function TicketFormPage({ searchParams }: props) {
       }
 
       // return ticket form
-      console.log(customer);
+      return <TicketForm customer={customer} />;
     }
 
     // Edit ticket form
@@ -70,6 +71,7 @@ export default async function TicketFormPage({ searchParams }: props) {
       // return ticket form
       console.log("ticket: ", ticket);
       console.log("customer: ", customer);
+      return <TicketForm customer={customer} ticket={ticket} />;
     }
   } catch (e) {
     if (e instanceof Error) {
