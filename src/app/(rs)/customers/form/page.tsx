@@ -7,6 +7,19 @@ type props = {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 };
 
+export async function generateMetadata({ searchParams }: props) {
+  const { customerId } = await searchParams;
+
+  if (!customerId)
+    return {
+      title: "New Customer",
+    };
+
+  return {
+    title: `Edit Customer #${customerId}`,
+  };
+}
+
 export default async function CustomerFormPage({ searchParams }: props) {
   try {
     const { customerId } = await searchParams;
