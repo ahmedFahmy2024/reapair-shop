@@ -15,6 +15,11 @@ import {
 } from "@/zod-schemas/ticket";
 import { selectCustomerSchemaType } from "@/zod-schemas/customer";
 import { CheckboxWithLabel } from "@/components/inputs/CheckboxWithLabel";
+import { useAction } from "next-safe-action/hooks";
+import { toast } from "sonner";
+import { saveTicketAction } from "@/actions/saveTicketAction";
+import { Loader2 } from "lucide-react";
+import { DisplayServerActionResponse } from "@/components/DisplayServerActionResponse";
 
 type Props = {
   customer: selectCustomerSchemaType;
@@ -46,12 +51,30 @@ export default function TicketForm({
     defaultValues,
   });
 
+  const {
+    execute: excuteSave,
+    result: saveResult,
+    reset: resetSaveAction,
+    isPending: isSaving,
+  } = useAction(saveTicketAction, {
+    onSuccess: () => {
+      toast.success("Ticket saved successfully!");
+    },
+    onError: ({ error }) => {
+      toast.error(
+        error.serverError || "An error occurred while saving the ticket"
+      );
+    },
+  });
+
   async function submitForm(data: insertTicketSchemaType) {
-    console.log(data);
+    // console.log(data);
+    excuteSave(data);
   }
 
   return (
     <div className="flex flex-col gap-1 sm:px-8">
+      <DisplayServerActionResponse result={saveResult} />
       <div>
         <h2 className="text-2xl font-bold">
           {ticket?.id && isEditable
@@ -134,14 +157,24 @@ export default function TicketForm({
                   className="w-3/4"
                   variant="default"
                   title="Save"
+                  disabled={isSaving}
                 >
-                  Save
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Saving
+                    </>
+                  ) : (
+                    "Save"
+                  )}
                 </Button>
                 <Button
                   type="button"
                   variant="destructive"
                   title="Reset"
-                  onClick={() => form.reset(defaultValues)}
+                  onClick={() => {
+                    form.reset(defaultValues);
+                    resetSaveAction();
+                  }}
                 >
                   Reset
                 </Button>
